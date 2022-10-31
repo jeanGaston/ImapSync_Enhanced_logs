@@ -56,7 +56,7 @@ def save_errors_in_CSV(Errors, account, path):
             writer.writerow(['time', 'error'])
             writer.writerows(Errors)
     a = pd.read_csv(f'{path}/resume/errors/{account}_errors.csv')
-    a.to_html(f'{path}/resume/errors/html/{account}_errors.html', escape=False)
+    a.to_html(f'{path}/resume/errors/html/{account}_errors.html', escape=False, justify='center')
 
     
 
@@ -95,7 +95,7 @@ def list_files(basepath):
 
 def get_date_and_time():
     """
-    get the current time and store it in NOW_TIME
+    get the current time 
     """
     now_time = datetime.datetime.now()
     return now_time.strftime("%d/%m/%Y %H:%M:%S")
@@ -113,4 +113,5 @@ for file in file_list:
 
 
 a = pd.read_csv(f'{path}/resume/resume_logs.csv')
-a.to_html(f'{path}/resume/resume_logs.html', escape=False)
+a.to_html(f'{path}/resume/resume_logs.html', escape=False, justify='center')
+print(f'You can view the resume in this file : {path}/resume/resume_logs.html')
