@@ -1,3 +1,4 @@
+import datetime
 import os, csv, pandas as pd
 
 
@@ -6,7 +7,7 @@ def open_logs(path, file):
 
     with open(f'{path}/{file}', encoding='utf-8') as f:
         logs = f.read()
-    #ici on isole la partie statistics
+    #here we isolate the statistical part
     tmp = logs.split("++++ Statistics" )[1]
     tmp = tmp.split("\n")
     Stats = []
@@ -14,21 +15,21 @@ def open_logs(path, file):
         if ":" in a:
             Stats.append(a.split(":", 1))
     Stats = Stats[:28]
-    compte = file.split('_')[7]
+    account = file.split('_')[7]
 
-    #ici on isole la partie des erreurs s'il y en a
+    #here we isolate the part of the errors if there are any
     Errors = []
     if "errors encountered" in logs :
-        tmp = logs.split("++++ Listing" )[2] #indice 2 car il y a une fois listing pour les dossiers dans les logs
+        tmp = logs.split("++++ Listing" )[2] #index 2 because there is once "listing" for the folders in the logs
         tmp = tmp.split("\n")
         Errors = []
         for a in tmp:
             if ":" in a:
-                Errors.append([a])
-        save_errors_in_CSV(Errors, compte, path)
+                Errors.append([get_date_and_time(),a])
+        save_errors_in_CSV(Errors, account, path)
 
 
-    return Stats, Errors, compte
+    return Stats, Errors, account
 
 def save_resume_in_CSV(resume, path):
     """
@@ -38,42 +39,43 @@ def save_resume_in_CSV(resume, path):
     if not os.path.isfile(f'{path}/resume/resume_logs.csv'):
         with open(f'{path}/resume/resume_logs.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
-            writer.writerow(["compte","dossiers synchronisés","message synchronisés","taille","erreurs de synchronisation"])
+            writer.writerow(["time","account","synchronized folder","synchronized messages","size","synchronization errors"])
     with open(f'{path}/resume/resume_logs.csv', 'a+', encoding='UTF8', newline='') as f :
         writer = csv.writer(f)
         writer.writerow(resume)
 
     
-def save_errors_in_CSV(Errors, compte, path):
+def save_errors_in_CSV(Errors, account, path):
     """
     Crrate a new file with all the errors found during the transfert of the account
  
     """
     
-    with open(f'{path}/resume/errors/{compte}_errors.csv', 'w', encoding='UTF8', newline='' ) as f :
+    with open(f'{path}/resume/errors/{account}_errors.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
+            writer.writerow(['time', 'error'])
             writer.writerows(Errors)
-    a = pd.read_csv(f'{path}/resume/errors/{compte}_errors.csv')
-    a.to_html(f'{path}/resume/errors/html/{compte}_errors.html', escape=False)
+    a = pd.read_csv(f'{path}/resume/errors/{account}_errors.csv')
+    a.to_html(f'{path}/resume/errors/html/{account}_errors.html', escape=False)
 
     
 
 
     
-def data_generation(stats, Errors,  compte):
+def data_generation(stats, Errors,  account):
     sync_folders = stats[3][1]
     sync_messages = stats[4][1]
 
     size = stats[15][1]
-    size = size.split(" ")[2][1:] +" "+ size.split(" ")[3][:3] #taille GiB
+    size = size.split(" ")[2][1:] +" "+ size.split(" ")[3][:3] #size in GiB
 
     if Errors:
-        #on verifie si la liste des erreurs est vide ou non. 
-        errors = f'\u274C {len(Errors)} détectées, visible dans le <a href="./errors/html/{compte}_errors.html">fichier erreur</a>'
+        #Check if the error list is empty or not. 
+        errors = f'\u274C {len(Errors)} errors detected, you can see them in the <a href="./errors/html/{account}_errors.html">errors file</a>'
     else:
-        errors = f'\u2705 aucune erreur détectée'
+        errors = f'\u2705 no error detcted'
 
-    return [compte,sync_folders,sync_messages,size, errors]
+    return [get_date_and_time(), account,sync_folders,sync_messages,size, errors]
 
 def list_files(basepath):
     """
@@ -88,20 +90,26 @@ def list_files(basepath):
     try:
         os.makedirs(f'{path}/resume/errors/html')
     except:
-        print('le dossier existe déjà')
+        print('the folder already exist')
     return file_list
 
+def get_date_and_time():
+    """
+    get the current time and store it in NOW_TIME
+    """
+    now_time = datetime.datetime.now()
+    return now_time.strftime("%d/%m/%Y %H:%M:%S")
 
 
 
-path = input("entrez le chemin jusqu'au dossier de log \n")
+path = input("Please ente the path to the log folder \n")
 file_list = list_files(path)
 
 for file in file_list:
     logs = open_logs(path, file)
     out = data_generation(logs[0], logs[1], logs[2])
     save_resume_in_CSV(out, path)
-    print(f'fait pour {logs[2]}')
+    print(f'Done for {logs[2]}')
 
 
 a = pd.read_csv(f'{path}/resume/resume_logs.csv')
