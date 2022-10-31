@@ -2,6 +2,7 @@ import datetime
 import os, csv, pandas as pd
 
 
+
 def open_logs(path, file):
     """open the logs file and return the statistics part of the file in a list, all the errors encourtered if they exist and the account name"""
 
@@ -39,7 +40,7 @@ def save_resume_in_CSV(resume, path):
     if not os.path.isfile(f'{path}/resume/resume_logs.csv'):
         with open(f'{path}/resume/resume_logs.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
-            writer.writerow(["time","account","synchronized folder","synchronized messages","size","synchronization errors"])
+            writer.writerow(["Date","Account","Synchronized folder","Synchronized messages","Size","Synchronization errors"])
     with open(f'{path}/resume/resume_logs.csv', 'a+', encoding='UTF8', newline='') as f :
         writer = csv.writer(f)
         writer.writerow(resume)
@@ -47,22 +48,33 @@ def save_resume_in_CSV(resume, path):
     
 def save_errors_in_CSV(Errors, account, path):
     """
-    Crrate a new file with all the errors found during the transfert of the account
+    Create a new file with all the errors found during the transfert of the account
  
     """
     
     with open(f'{path}/resume/errors/{account}_errors.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
-            writer.writerow(['time', 'error'])
+            writer.writerow(['Date', 'Error'])
             writer.writerows(Errors)
-    a = pd.read_csv(f'{path}/resume/errors/{account}_errors.csv')
-    a.to_html(f'{path}/resume/errors/html/{account}_errors.html', escape=False, justify='center')
+    save_in_html(f'{path}/resume/errors/', f'{account}_errors.csv', './css_style/style_css_error.txt',f'html/{account}_errors.html')
 
     
+def save_in_html(path,file_name,style_sheet,out_file_name):
+    """
+    save the file in html with the specified style sheet applied to it
+    """
+    a = pd.read_csv(f'{path}/{file_name}')
+    #open the css sheet
+    with open(style_sheet, 'r') as myfile:
+        style = myfile.read()
 
+    html = """<html><head></head>{1}<div>{0}</div></html>""".format(a.to_html(escape=False, justify='center', table_id='tab'),style)
+    #save the html file
+    with open(f'{path}/{out_file_name}', 'w', encoding='UTF8' ) as f :
+        f.write(html)
 
     
-def data_generation(stats, Errors,  account):
+def data_generation(stats, Errors,  account, path):
     sync_folders = stats[3][1]
     sync_messages = stats[4][1]
 
@@ -71,9 +83,9 @@ def data_generation(stats, Errors,  account):
 
     if Errors:
         #Check if the error list is empty or not. 
-        errors = f'\u274C {len(Errors)} errors detected, you can see them in the <a href="./errors/html/{account}_errors.html">errors file</a>'
+        errors = f'\u274C {len(Errors)} errors detected, you can see them in the <a href="{path}/resume/errors/html/{account}_errors.html">errors file</a>'
     else:
-        errors = f'\u2705 no error detcted'
+        errors = f'\u2705 no error detected'
 
     return [get_date_and_time(), account,sync_folders,sync_messages,size, errors]
 
@@ -107,11 +119,12 @@ file_list = list_files(path)
 
 for file in file_list:
     logs = open_logs(path, file)
-    out = data_generation(logs[0], logs[1], logs[2])
+    out = data_generation(logs[0], logs[1], logs[2], path)
     save_resume_in_CSV(out, path)
     print(f'Done for {logs[2]}')
 
+save_in_html(f'{path}/resume/', 'resume_logs.csv', './css_style/style_css.txt', 'resume_logs.html')
 
-a = pd.read_csv(f'{path}/resume/resume_logs.csv')
-a.to_html(f'{path}/resume/resume_logs.html', escape=False, justify='center')
+
+
 print(f'You can view the resume in this file : {path}/resume/resume_logs.html')
