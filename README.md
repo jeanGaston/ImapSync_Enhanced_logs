@@ -32,9 +32,9 @@ it will automatically install the dependency of the program and then execute it.
 
 ## How to use
 
-Once you have launched the program. You'll need to enter the path of the logs' folder.
+Once you have launched the program. You'll need to enter the path of the logs' folder and where to save the output.
 
-you can either use this format :
+In both cases you can either use this format :
 ````
 C:\path\to\your\logs
 ````
@@ -50,11 +50,12 @@ Same for the errors files
 
 you can find them with those path :
 ````
-C:\path\to\your\logs\resume\resume_logs.html
+C:\the\path\you\gave\before\resume\resume_logs.html
 ````
 or 
 ````
-/path/to/your/logs/resume_logs.html
+/the/path/you/gave/before/resume_logs.html
 ````
 
 You can open the HTML resume with you favorite browser.
+
