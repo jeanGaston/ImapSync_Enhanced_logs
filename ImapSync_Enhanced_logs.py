@@ -26,7 +26,7 @@ def open_logs(path, file, saving_path):
         Errors = []
         for a in tmp:
             if ":" in a:
-                Errors.append([get_date_and_time(),a])
+                Errors.append(a)
         save_errors_in_CSV(Errors, account, saving_path)
 
 
@@ -40,22 +40,51 @@ def save_resume_in_CSV(resume, path):
     if not os.path.isfile(f'{path}/resume/resume_logs.csv'):
         with open(f'{path}/resume/resume_logs.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
-            writer.writerow(["Date","Account","Synchronized folder","Synchronized messages","Size","Synchronization errors"])
+            writer.writerow(["Date of execution","Account","Synchronized folder","Synchronized messages","Size","Synchronization errors"])
     with open(f'{path}/resume/resume_logs.csv', 'a+', encoding='UTF8', newline='') as f :
         writer = csv.writer(f)
         writer.writerow(resume)
 
     
-def save_errors_in_CSV(Errors, account, path):
+def save_errors_in_CSV(errors, account, path):
     """
     Create a new file with all the errors found during the transfert of the account
     The path is where the error file will be saved
  
     """
     
+    Errors = []
+    for error in errors:
+        try:
+            # retrieve informations about the failed message
+            Subject = error.split('Subject:[')[1]
+            Subject = Subject.split(']')[0]
+            
+
+            Date = error.split('Date:["')[1]
+            Date = Date.split('"]')[0]
+            
+
+            Size = error.split('Size:[')[1]
+            Size = Size.split(']')[0]
+            
+
+            Folder = error.split('to folder')[1]
+            Folder = Folder.split(':')[0]
+            
+            
+
+        except:
+            #if the error isn't about a message
+            Subject = error
+            Date = '-'
+            Size = '-'
+            Folder = '-'
+        Errors.append([get_date_and_time(),Subject, Date, Size, Folder])
+
     with open(f'{path}/resume/errors/{account}_errors.csv', 'w', encoding='UTF8', newline='' ) as f :
             writer = csv.writer(f)
-            writer.writerow(['Date', 'Error'])
+            writer.writerow(['Date of execution', 'Subject / Raw error','Date','Size','Folder'])
             writer.writerows(Errors)
     save_in_html(f'{path}/resume/errors/', f'{account}_errors.csv', './css_style/style_css_error.txt',f'html/{account}_errors.html')
 
