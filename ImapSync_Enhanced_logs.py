@@ -99,7 +99,17 @@ def save_in_html(path,file_name,style_sheet,out_file_name):
     with open(style_sheet, 'r') as myfile:
         style = myfile.read()
 
-    html = """<html><head></head>{1}<div>{0}</div></html>""".format(a.to_html(escape=False, justify='center', table_id='tab'),style)
+    html = """
+    <!doctype html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+        </head>
+        {1}
+        <div>
+            {0}
+        </div>
+    </html>""".format(a.to_html(escape=False, justify='center', table_id='tab'),style)
     #save the html file
     with open(f'{path}/{out_file_name}', 'w', encoding='UTF8' ) as f :
         f.write(html)
