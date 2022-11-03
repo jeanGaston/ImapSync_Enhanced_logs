@@ -9,6 +9,17 @@ Those informations are :
 - The amount of errors
 - Wich messages get error while being synchronized
 
+<<<<<<< Updated upstream
+=======
+## Requirements
+
+You'll need python 3.xx or higher installed on your computer. \
+You'll also need the library pandas, which you can install with this command:
+```
+pip install pandas
+```
+
+>>>>>>> Stashed changes
 ## How to execute
 
 First you'll need to clone the main branch of this repository.
