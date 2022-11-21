@@ -11,7 +11,7 @@ Those informations are :
 
 ## Requirements
 
-You'll need python 3.xx or higher installed on your computer 
+You'll need python 3.xx or higher installed on your computer. \
 You'll also need the library pandas, which you can install with this command:
 ```
 pip install pandas

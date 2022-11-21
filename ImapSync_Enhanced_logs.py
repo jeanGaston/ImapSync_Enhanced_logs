@@ -3,6 +3,7 @@ import os, csv, pandas as pd
 
 
 
+
 def open_logs(path, file, saving_path):
     """open the logs file and return the statistics part of the file in a list, all the errors encourtered if they exist and the account name"""
 
@@ -166,6 +167,7 @@ try:
     os.makedirs(f'{saving_path}/resume/errors/html')
 except:
     print('the folder already exist')
+    
 
 file_list = list_files(path)
 
@@ -174,6 +176,7 @@ for file in file_list:
     out = data_generation(logs[0], logs[1], logs[2], saving_path)
     save_resume_in_CSV(out, saving_path)
     print(f'Done for {logs[2]}')
+    
 
 save_in_html(f'{saving_path}/resume/', 'resume_logs.csv', './css_style/style_css.txt', 'resume_logs.html')
 
